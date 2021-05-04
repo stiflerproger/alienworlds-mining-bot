@@ -147,6 +147,9 @@ export class Alien extends Events {
         });
 
         this.error('Initiating error, sleeping for 5sec');
+
+        if (e?.response?.data) this.error(JSON.stringify(e?.response?.data));
+        
         await sleep(5000);
       }
     }
