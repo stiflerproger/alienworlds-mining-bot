@@ -149,7 +149,7 @@ export class Alien extends Events {
         this.error('Initiating error, sleeping for 5sec');
 
         if (e?.response?.data) this.error(JSON.stringify(e?.response?.data));
-        
+
         await sleep(5000);
       }
     }
@@ -391,6 +391,7 @@ export class Alien extends Events {
         origin: 'https://play.alienworlds.io',
         referer: 'https://play.alienworlds.io/',
       },
+      withCredentials: true
     });
 
     return res.data;
