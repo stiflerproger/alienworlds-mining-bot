@@ -310,7 +310,7 @@ export class Alien extends Events {
     let response;
 
     try {
-      const response = await this.client.post('https://all-access.wax.io/api/session', {
+      response = await this.client.post('https://all-access.wax.io/api/session', {
         'g-recaptcha-response': captcha,
         username: this.options.email,
         password: this.options.password,
