@@ -385,6 +385,8 @@ export class Alien extends Events {
 
   public async autoAcceptLogin(): Promise<AutoAcceptLogin> {
 
+    console.log(this.getCookieValue('session_token'));
+
     const res = await this.client.get('https://api-idm.wax.io/v1/accounts/auto-accept/login', {
       headers: {
         cookie: 'session_token=' + this.getCookieValue('session_token'),
@@ -542,10 +544,15 @@ export class Alien extends Events {
 
     this.log(`Claim rewards after: ${Math.floor(nextMineAfter / 1000)} sec.`);
 
+    const range = {
+      nextMineAfter: nextMineAfter,
+      withAddedDelay: timeRange(30000 + nextMineAfter, 180000 + nextMineAfter)
+    };
+
     this.setStatus({
       type: "timer",
-      timer: Math.floor(nextMineAfter / 1000),
-      event: "Сбор TLM"
+      timer: Math.floor(range.withAddedDelay / 1000),
+      event: `Сбор TLM (${Math.floor(range.nextMineAfter / 1000)}s + ${Math.floor(range.withAddedDelay / 1000)}s)`
     });
 
     this.claimTimeout = setTimeout(async () => {
@@ -603,7 +610,7 @@ export class Alien extends Events {
       await sleep(5000);
       this.emit('ready-to-mine', this.options.email);
 
-    }, timeRange(2000 + nextMineAfter, 7000 + nextMineAfter));
+    }, range.withAddedDelay);
 
   }
 
