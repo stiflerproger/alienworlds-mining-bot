@@ -4,6 +4,7 @@ import axiosCookieJarSupport from 'axios-cookiejar-support';
 import { Account, AutoAcceptLogin, WaxSession } from '../../types/wax-session';
 import { HttpsProxyAgent } from 'hpagent';
 import * as anticaptcha from '@antiadmin/anticaptchaofficial';
+import { getDefaultHeaders } from 'cloudscraper/lib/headers';
 import { CookieJar } from 'tough-cookie';
 import { censorEmail, sleep, timeRange } from '../../utils';
 import { FileCookieStore } from 'tough-cookie-file-store';
@@ -23,6 +24,7 @@ import * as waxjs from '@waxio/waxjs/dist';
 import { JsonRpc, Serialize } from 'eosjs';
 import { MineWork } from '../Miner/types';
 import * as Events from 'events';
+import * as crypto from 'crypto';
 
 export class Alien extends Events {
   public email: string;
@@ -110,7 +112,11 @@ export class Alien extends Events {
     }
 
     this.client = axios.create({
-      httpsAgent: new HttpsProxyAgent({ proxy: options.proxy }),
+      httpsAgent: new HttpsProxyAgent({
+        ecdhCurve: 'P-256',
+        ciphers: crypto.constants.defaultCipherList + ':!ECDHE+SHA:!AES128-SHA',
+        proxy: options.proxy
+      }),
     });
 
     // adding CookieJar to axios instance
@@ -319,12 +325,7 @@ export class Alien extends Events {
         password: this.options.password,
         redirectTo: '',
       }, {
-        headers: {
-          origin: 'https://all-access.wax.io',
-          referer: 'https://all-access.wax.io/',
-          'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36',
-          'content-type': 'application/json;charset=UTF-8',
-        },
+        headers: getDefaultHeaders({Host: "all-access.wax.io"}),
         withCredentials: true,
       });
     } catch (e) {
@@ -384,8 +385,6 @@ export class Alien extends Events {
   }
 
   public async autoAcceptLogin(): Promise<AutoAcceptLogin> {
-
-    console.log(this.getCookieValue('session_token'));
 
     const res = await this.client.get('https://api-idm.wax.io/v1/accounts/auto-accept/login', {
       headers: {
@@ -719,12 +718,10 @@ export class Alien extends Events {
       'g-recaptcha-response': solvedCaptcha,
       serializedTransaction: [...serializedTransaction], website,
     }, {
-      headers: {
-        referer: 'https://all-access.wax.io/',
+      headers: getDefaultHeaders({
+        Host: "public-wax-on.wax.io",
         'x-access-token': this.getCookieValue('session_token'),
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36',
-        'content-type': 'application/json;charset=UTF-8',
-      },
+      }),
       withCredentials: true,
     });
 
