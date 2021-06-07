@@ -682,6 +682,7 @@ export class Alien extends Events {
   /** Get signatures for transaction */
   private async signTransaction(serializedTransaction: Uint8Array, website = 'play.alienworlds.io') {
 
+    /**
     this.log('Solving captcha..');
 
     let solvedCaptcha: string;
@@ -712,10 +713,11 @@ export class Alien extends Events {
     this.setStatus("Собираю TLM... подписываю");
 
     this.log('Captcha Solved!', solvedCaptcha.slice(0, 15) + '....');
+    */
 
     const result: AxiosResponse<{ signatures: string[] }> = await this.client.post('https://public-wax-on.wax.io/wam/sign', {
       description: 'jwt is insecure',
-      'g-recaptcha-response': solvedCaptcha,
+      //'g-recaptcha-response': solvedCaptcha,
       serializedTransaction: [...serializedTransaction], website,
     }, {
       headers: getDefaultHeaders({
